@@ -1,24 +1,35 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
+/**
+ * Animated counter that increments when visible
+ * @param {number} end - Target number
+ * @param {boolean} active - Start counting when true
+ * @returns {number} current count
+ */
 export function useCounter(end, active) {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
-    if (!active) return;
-    let start = 0;
-    const duration = 1400;
-    const step = Math.max(1, Math.floor(end / 60));
+    if (!active || count === end) return;
+
+    const duration = 1400; // ms
+    const steps = 60;
+    const stepDuration = duration / steps;
+    const increment = end / steps;
+
+    let current = 0;
     const timer = setInterval(() => {
-      start += step;
-      if (start >= end) {
+      current += increment;
+      if (current >= end) {
         setCount(end);
         clearInterval(timer);
       } else {
-        setCount(start);
+        setCount(Math.floor(current));
       }
-    }, duration / 60);
+    }, stepDuration);
+
     return () => clearInterval(timer);
-  }, [active, end]);
+  }, [active, end, count]);
 
   return count;
 }
